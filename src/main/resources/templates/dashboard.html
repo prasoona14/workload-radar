@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Workload Radar</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+        }
+
+        h2 {
+            margin-top: 40px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <h1>📊 Workload Radar</h1>
+
+    <form method="get" action="/">
+        <label>Select Week:</label>
+        <input type="date" name="date" th:value="${selectedDate}">
+        <button type="submit">View</button>
+    </form>
+
+    <h2>Weekly Metrics</h2>
+    <p>Workload Score: <span th:text="${metrics.workloadScore}"></span></p>
+    <p>Free Hours: <span th:text="${metrics.freeHours}"></span></p>
+    <p>Busiest Day: <span th:text="${metrics.busiestDay}"></span></p>
+    <p>Pressure Level: <span th:text="${metrics.pressureLevel}"></span></p>
+
+    <h2>Events</h2>
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Type</th>
+        </tr>
+        <tr th:each="event : ${events}">
+            <td th:text="${event.title}"></td>
+            <td th:text="${event.startTime}"></td>
+            <td th:text="${event.endTime}"></td>
+            <td th:text="${event.type}"></td>
+        </tr>
+    </table>
+
+    <h2>AI Study Plan</h2>
+
+    <div th:each="block : ${aiPlan.studyBlocks}">
+        <p>
+            <strong th:text="${block.day}"></strong>
+            (<span th:text="${block.startTime}"></span>)
+            - <span th:text="${block.description}"></span>
+        </p>
+    </div>
+
+    <h3>Tips</h3>
+    <ul>
+        <li th:each="tip : ${aiPlan.tips}" th:text="${tip}"></li>
+    </ul>
+
+</body>
+
+</html>

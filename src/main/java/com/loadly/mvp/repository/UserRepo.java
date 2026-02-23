@@ -1,0 +1,11 @@
+package com.loadly.mvp.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.loadly.mvp.model.User;
+
+@Repository
+public interface UserRepo extends JpaRepository<User, Integer> {
+
+}
