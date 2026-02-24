@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.loadly.mvp.engine.WeeklyMetrics;
 import com.loadly.mvp.engine.WorkloadEngine;
 import com.loadly.mvp.model.CalendarEvent;
+import com.loadly.mvp.model.User;
 import com.loadly.mvp.repository.CalendarEventRepo;
 
 @Service
@@ -20,7 +21,8 @@ public class EventService {
     @Autowired
     WorkloadEngine workloadEngine;
 
-    public CalendarEvent createEvent(CalendarEvent event) {
+    public CalendarEvent createEvent(CalendarEvent event, User user) {
+        event.setUser(user);
         return calendarEventRepo.save(event);
     }
 
@@ -28,16 +30,16 @@ public class EventService {
         calendarEventRepo.deleteById(eventId);
     }
 
-    public List<CalendarEvent> getEventsForUser(int userId) {
-        return calendarEventRepo.findByUserId(userId);
+    public List<CalendarEvent> getEventsForUser(User user) {
+        return calendarEventRepo.findByUser(user);
     }
 
-    public List<CalendarEvent> getEventsForWeek(int userId, LocalDateTime weekStart, LocalDateTime weekEnd) {
-        return calendarEventRepo.findByUserIdAndStartTimeBetween(userId, weekStart, weekEnd);
+    public List<CalendarEvent> getEventsForWeek(User user, LocalDateTime weekStart, LocalDateTime weekEnd) {
+        return calendarEventRepo.findByUserAndStartTimeBetween(user, weekStart, weekEnd);
     }
 
-    public WeeklyMetrics getWeeklyAnalysis(int userId, LocalDateTime weekStart, LocalDateTime weekEnd) {
-        List<CalendarEvent> weeklyEvents = getEventsForWeek(userId, weekStart, weekEnd);
+    public WeeklyMetrics getWeeklyAnalysis(User user, LocalDateTime weekStart, LocalDateTime weekEnd) {
+        List<CalendarEvent> weeklyEvents = getEventsForWeek(user, weekStart, weekEnd);
         return workloadEngine.computeWeeklyMetrics(weeklyEvents);
     }
 

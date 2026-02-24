@@ -10,55 +10,60 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.loadly.mvp.ai.AIPlannerService;
+import com.loadly.mvp.model.User;
+import com.loadly.mvp.repository.UserRepo;
 import com.loadly.mvp.service.EventService;
 
 @Controller
 public class DashboardController {
 
-    private final EventService eventService;
-    private final AIPlannerService aiPlannerService;
+        private final EventService eventService;
+        private final AIPlannerService aiPlannerService;
+        private final UserRepo userRepo;
 
-    public DashboardController(EventService eventService,
-            AIPlannerService aiPlannerService) {
-        this.eventService = eventService;
-        this.aiPlannerService = aiPlannerService;
-    }
-
-    @GetMapping("/")
-    public String dashboard(
-            @RequestParam(required = false) String date,
-            Model model) {
-
-        int userId = 1;
-
-        LocalDate selectedDate;
-
-        if (date != null) {
-            selectedDate = LocalDate.parse(date);
-        } else {
-            selectedDate = LocalDate.now();
+        public DashboardController(EventService eventService,
+                        AIPlannerService aiPlannerService, UserRepo userRepo) {
+                this.eventService = eventService;
+                this.aiPlannerService = aiPlannerService;
+                this.userRepo = userRepo;
         }
 
-        LocalDateTime weekStart = selectedDate
-                .with(DayOfWeek.MONDAY)
-                .atStartOfDay();
+        @GetMapping("/")
+        public String dashboard(
+                        @RequestParam(required = false) String date,
+                        Model model) {
 
-        LocalDateTime weekEnd = weekStart
-                .plusDays(6)
-                .withHour(23)
-                .withMinute(59);
+                User user = userRepo.findById(1)
+                                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        model.addAttribute("selectedDate", selectedDate);
+                LocalDate selectedDate;
 
-        model.addAttribute("events",
-                eventService.getEventsForWeek(userId, weekStart, weekEnd));
+                if (date != null) {
+                        selectedDate = LocalDate.parse(date);
+                } else {
+                        selectedDate = LocalDate.now();
+                }
 
-        model.addAttribute("metrics",
-                eventService.getWeeklyAnalysis(userId, weekStart, weekEnd));
+                LocalDateTime weekStart = selectedDate
+                                .with(DayOfWeek.MONDAY)
+                                .atStartOfDay();
 
-        model.addAttribute("aiPlan",
-                aiPlannerService.generatWeeklyPlan(userId, weekStart, weekEnd));
+                LocalDateTime weekEnd = weekStart
+                                .plusDays(6)
+                                .withHour(23)
+                                .withMinute(59);
 
-        return "dashboard";
-    }
+                model.addAttribute("selectedDate", selectedDate);
+
+                model.addAttribute("events",
+                                eventService.getEventsForWeek(user, weekStart, weekEnd));
+
+                model.addAttribute("metrics",
+                                eventService.getWeeklyAnalysis(user, weekStart, weekEnd));
+
+                model.addAttribute("aiPlan",
+                                aiPlannerService.generatWeeklyPlan(user, weekStart, weekEnd));
+
+                return "dashboard";
+        }
 }
