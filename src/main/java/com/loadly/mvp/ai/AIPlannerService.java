@@ -12,6 +12,7 @@ import com.loadly.mvp.engine.FreeWindow;
 import com.loadly.mvp.engine.WeeklyMetrics;
 import com.loadly.mvp.engine.WorkloadEngine;
 import com.loadly.mvp.model.CalendarEvent;
+import com.loadly.mvp.model.User;
 import com.loadly.mvp.service.EventService;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -46,10 +47,10 @@ public class AIPlannerService {
                 .build();
     }
 
-    public AIWeeklyPlan generatWeeklyPlan(int userId, LocalDateTime weekStart, LocalDateTime weekEnd) {
+    public AIWeeklyPlan generatWeeklyPlan(User user, LocalDateTime weekStart, LocalDateTime weekEnd) {
 
         // 1. Fetch user's calendar events for the week
-        List<CalendarEvent> events = eventService.getEventsForWeek(userId, weekStart, weekEnd);
+        List<CalendarEvent> events = eventService.getEventsForWeek(user, weekStart, weekEnd);
 
         // 2. Compute weekly metrics
         WeeklyMetrics metrics = workloadEngine.computeWeeklyMetrics(events);
@@ -57,7 +58,7 @@ public class AIPlannerService {
         List<FreeWindow> freeWindows = freeTimeCalculator.calculateFreeWindows(events, weekStart);
 
         // 3) Build prompt
-        String prompt = buildPrompt(userId, weekStart, weekEnd, metrics, events, freeWindows);
+        String prompt = buildPrompt(user, weekStart, weekEnd, metrics, events, freeWindows);
 
         // 4) Call AI API
         try {
@@ -78,7 +79,7 @@ public class AIPlannerService {
 
     }
 
-    private String buildPrompt(int userId, LocalDateTime weekStart, LocalDateTime weekEnd, WeeklyMetrics metrics,
+    private String buildPrompt(User user, LocalDateTime weekStart, LocalDateTime weekEnd, WeeklyMetrics metrics,
             List<CalendarEvent> events, List<FreeWindow> freeWindows) {
         StringBuilder sb = new StringBuilder();
         sb.append("You are an academic productivity planner.\n");
@@ -90,7 +91,7 @@ public class AIPlannerService {
         sb.append("  \"tips\": [\"...\"]\n");
         sb.append("}\n\n");
 
-        sb.append("UserId: ").append(userId).append("\n");
+        sb.append("UserId: ").append(user.getId()).append("\n");
         sb.append("Week: ").append(weekStart).append(" to ").append(weekEnd).append("\n\n");
 
         sb.append("Weekly Metrics:\n");

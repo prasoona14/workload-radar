@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.loadly.mvp.engine.WeeklyMetrics;
 import com.loadly.mvp.model.CalendarEvent;
+import com.loadly.mvp.model.User;
 import com.loadly.mvp.service.EventService;
+import com.loadly.mvp.service.UserService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,10 +27,14 @@ public class EventController {
     @Autowired
     EventService eventService;
 
+    @Autowired
+    private UserService userService;
+
     // Create Event
     @PostMapping
-    public CalendarEvent createEvent(@RequestBody CalendarEvent event) {
-        return eventService.createEvent(event);
+    public CalendarEvent createEvent(@RequestBody CalendarEvent event, @RequestParam int userId) {
+        User user = userService.getUserById(userId);
+        return eventService.createEvent(event, user);
     }
 
     // DeleteEvent
@@ -40,7 +46,8 @@ public class EventController {
     // Get All Events for User
     @GetMapping("/user/{userId}")
     public List<CalendarEvent> getEventsForUser(@PathVariable int userId) {
-        return eventService.getEventsForUser(userId);
+        User user = userService.getUserById(userId);
+        return eventService.getEventsForUser(user);
     }
 
     // Get Events for Week
@@ -49,7 +56,8 @@ public class EventController {
             @RequestParam int userId,
             @RequestParam String weekStart,
             @RequestParam String weekEnd) {
-        return eventService.getEventsForWeek(userId, LocalDateTime.parse(weekStart), LocalDateTime.parse(weekEnd));
+        User user = userService.getUserById(userId);
+        return eventService.getEventsForWeek(user, LocalDateTime.parse(weekStart), LocalDateTime.parse(weekEnd));
     }
 
     @GetMapping("/user/{userId}/analysis/week")
@@ -58,7 +66,8 @@ public class EventController {
             @RequestParam String weekStart,
             @RequestParam String weekEnd) {
 
-        return eventService.getWeeklyAnalysis(userId, LocalDateTime.parse(weekStart), LocalDateTime.parse(weekEnd));
+        User user = userService.getUserById(userId);
+        return eventService.getWeeklyAnalysis(user, LocalDateTime.parse(weekStart), LocalDateTime.parse(weekEnd));
     }
 
 }
