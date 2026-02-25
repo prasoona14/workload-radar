@@ -30,10 +30,11 @@ public class DashboardController {
 
         @GetMapping("/")
         public String dashboard(
+                        @RequestParam int userId,
                         @RequestParam(required = false) String date,
                         Model model) {
 
-                User user = userRepo.findById(1)
+                User user = userRepo.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
                 LocalDate selectedDate;
