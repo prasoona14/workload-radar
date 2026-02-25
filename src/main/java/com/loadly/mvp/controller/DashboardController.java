@@ -55,6 +55,7 @@ public class DashboardController {
                                 .withMinute(59);
 
                 model.addAttribute("selectedDate", selectedDate);
+                model.addAttribute("userId", userId);
 
                 model.addAttribute("events",
                                 eventService.getEventsForWeek(user, weekStart, weekEnd));
