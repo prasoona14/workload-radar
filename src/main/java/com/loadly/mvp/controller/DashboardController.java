@@ -4,6 +4,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,12 +32,16 @@ public class DashboardController {
 
         @GetMapping("/")
         public String dashboard(
-                        @RequestParam int userId,
                         @RequestParam(required = false) String date,
                         Model model) {
 
-                User user = userRepo.findById(userId)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+                        return "redirect:/login";
+                }
+                String email = auth.getName();
+                User user = userRepo.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("Logged-in user not found in DB"));
 
                 LocalDate selectedDate;
 
@@ -55,7 +61,7 @@ public class DashboardController {
                                 .withMinute(59);
 
                 model.addAttribute("selectedDate", selectedDate);
-                model.addAttribute("userId", userId);
+                model.addAttribute("user", user);
 
                 model.addAttribute("events",
                                 eventService.getEventsForWeek(user, weekStart, weekEnd));
