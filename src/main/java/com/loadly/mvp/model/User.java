@@ -1,5 +1,7 @@
 package com.loadly.mvp.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,5 +27,10 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "canvas_ics_url")
+    private String canvasIcsUrl;
+
+    private LocalDateTime lastSyncedAt;
 
 }
