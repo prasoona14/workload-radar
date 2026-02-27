@@ -31,9 +31,8 @@
 
     <h1>📊 Workload Radar</h1>
 
-    <form method="get" action="/">
+    <form method="get" action="/dashboard">
         <label>Select Week:</label>
-        <input type="hidden" name="userId" th:value="${userId}" />
         <input type="date" name="date" th:value="${selectedDate}">
         <button type="submit">View</button>
     </form>

@@ -1,7 +1,9 @@
 package com.loadly.mvp.model;
 
 import java.time.LocalDateTime;
+import com.loadly.mvp.model.EventSource;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,6 +29,15 @@ public class CalendarEvent {
     @Enumerated(EnumType.STRING)
     private EventType type;
     private int effortHours;
+
+    @Column(name = "external_id", unique = true)
+    private String externalId;
+
+    @Column(length = 2000)
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    private EventSource source;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
