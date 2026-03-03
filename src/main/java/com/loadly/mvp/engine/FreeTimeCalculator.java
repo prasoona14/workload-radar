@@ -29,9 +29,13 @@ public class FreeTimeCalculator {
         double totalAvailable = HOURS_PER_DAY * DAYS_PER_WEEK;
 
         double busyHours = events.stream()
+                .filter(e -> e.getStartTime() != null)
+                .filter(e -> e.getEndTime() != null)
+                .filter(e -> !e.getEndTime().isBefore(e.getStartTime()))
                 .mapToDouble(e -> Duration.between(
                         e.getStartTime(),
-                        e.getEndTime()).toMinutes() / 60.0)
+                        e.getEndTime())
+                        .toMinutes() / 60.0)
                 .sum();
 
         return Math.max(0, totalAvailable - busyHours);
@@ -60,6 +64,9 @@ public class FreeTimeCalculator {
 
             // Filter events for this specific day
             List<CalendarEvent> dayEvents = events.stream()
+                    .filter(e -> e.getStartTime() != null)
+                    .filter(e -> e.getEndTime() != null)
+                    .filter(e -> !e.getEndTime().isBefore(e.getStartTime()))
                     .filter(e -> e.getStartTime().toLocalDate()
                             .equals(currentDay.toLocalDate()))
                     .sorted(Comparator.comparing(CalendarEvent::getStartTime))

@@ -27,9 +27,19 @@ public class WorkloadEngine {
 
         for (CalendarEvent event : events) {
 
-            double duration = Duration.between(
-                    event.getStartTime(),
-                    event.getEndTime()).toHours();
+            if (event.getStartTime() == null || event.getEndTime() == null) {
+                System.out.println("Skipping event with null time: " + event.getId());
+                continue;
+            }
+
+            if (event.getEndTime().isBefore(event.getStartTime())) {
+                System.out.println("Skipping invalid event (end before start): " + event.getId());
+                continue;
+            }
+
+            double duration = Duration
+                    .between(event.getStartTime(), event.getEndTime())
+                    .toHours();
 
             totalBusyHours += duration;
 
