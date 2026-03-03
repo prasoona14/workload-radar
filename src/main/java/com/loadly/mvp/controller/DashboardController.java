@@ -62,16 +62,13 @@ public class DashboardController {
 
                 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                 String email = auth.getName();
+
                 User user = userRepo.findByEmail(email)
                                 .orElseThrow(() -> new RuntimeException("Logged-in user not found in DB"));
 
-                LocalDate selectedDate;
-
-                if (date != null) {
-                        selectedDate = LocalDate.parse(date);
-                } else {
-                        selectedDate = LocalDate.now();
-                }
+                LocalDate selectedDate = (date != null)
+                                ? LocalDate.parse(date)
+                                : LocalDate.now();
 
                 LocalDateTime weekStart = selectedDate
                                 .with(DayOfWeek.MONDAY)
@@ -91,10 +88,39 @@ public class DashboardController {
                 model.addAttribute("metrics",
                                 eventService.getWeeklyAnalysis(user, weekStart, weekEnd));
 
-                model.addAttribute("aiPlan",
-                                aiPlannerService.generatWeeklyPlan(user, weekStart, weekEnd));
-
                 return "dashboard";
+        }
+
+        @GetMapping("/plan")
+        public String generatePlan(
+                        @RequestParam(required = false) String date,
+                        Model model) {
+
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                String email = auth.getName();
+
+                User user = userRepo.findByEmail(email)
+                                .orElseThrow(() -> new RuntimeException("Logged-in user not found in DB"));
+
+                LocalDate selectedDate = (date != null)
+                                ? LocalDate.parse(date)
+                                : LocalDate.now();
+
+                LocalDateTime weekStart = selectedDate
+                                .with(DayOfWeek.MONDAY)
+                                .atStartOfDay();
+
+                LocalDateTime weekEnd = weekStart
+                                .plusDays(6)
+                                .withHour(23)
+                                .withMinute(59);
+
+                var aiPlan = aiPlannerService.generatWeeklyPlan(user, weekStart, weekEnd);
+
+                model.addAttribute("aiPlan", aiPlan);
+                model.addAttribute("selectedDate", selectedDate);
+
+                return "plan";
         }
 
         @GetMapping("/setup")
