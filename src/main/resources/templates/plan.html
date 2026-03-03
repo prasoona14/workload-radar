@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>AI Study Plan</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🤖 AI Study Plan</h1>
+
+        <!-- Generate / Regenerate Button -->
+        <div class="card" style="text-align:center;">
+            <form method="post" action="/plan">
+                <input type="hidden" name="date" th:value="${selectedDate}">
+                <button type="submit" class="btn">
+                    🔄 Generate / Regenerate Plan
+                </button>
+            </form>
+        </div>
+
+        <!-- Study Blocks -->
+        <div class="card" th:if="${aiPlan != null}">
+            <h2>📅 Study Blocks</h2>
+
+            <div style="margin-top:20px;" th:each="block : ${aiPlan.studyBlocks}">
+
+                <div style="
+                background-color:#0f172a;
+                padding:15px;
+                border-radius:10px;
+                margin-bottom:15px;
+                border-left:4px solid #38bdf8;
+            ">
+
+                    <strong th:text="${block.day}"></strong>
+                    <span style="color:#94a3b8;">
+                        (<span th:text="${block.startTime}"></span>)
+                    </span>
+
+                    <p style="margin-top:8px;" th:text="${block.description}"></p>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="card" th:if="${aiPlan != null}">
+            <h2>💡 Productivity Tips</h2>
+
+            <div style="margin-top:20px;" th:each="tip : ${aiPlan.tips}">
+
+                <div style="
+                background-color:#1e293b;
+                padding:12px;
+                border-radius:8px;
+                margin-bottom:12px;
+                border-left:4px solid #22d3ee;
+            " th:text="${tip}">
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div style="margin-top:30px;">
+            <a th:href="@{/dashboard(date=${selectedDate})}" class="btn">
+                ⬅ Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
